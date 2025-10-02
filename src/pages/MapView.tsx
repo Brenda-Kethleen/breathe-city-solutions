@@ -56,37 +56,36 @@ const MapView = () => {
                     <Layers className="h-5 w-5" />
                     Camadas de Dados
                   </CardTitle>
-                  <Tabs value={activeLayer} onValueChange={setActiveLayer} className="w-auto">
-                    <TabsList>
-                      <TabsTrigger value="air-quality">Ar</TabsTrigger>
-                      <TabsTrigger value="heat">Calor</TabsTrigger>
-                      <TabsTrigger value="vegetation">Verde</TabsTrigger>
-                      <TabsTrigger value="population">População</TabsTrigger>
-                    </TabsList>
-                  </Tabs>
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Placeholder for Mapbox */}
-                <div className="relative w-full h-[500px] rounded-lg bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center border-2 border-dashed border-border">
-                  <div className="text-center space-y-4 p-8">
-                    <div className="rounded-full bg-secondary/10 w-16 h-16 flex items-center justify-center mx-auto">
-                      <Layers className="h-8 w-8 text-secondary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">Mapa Interativo</h3>
-                      <p className="text-sm text-muted-foreground max-w-md">
-                        Configure o Mapbox para visualizar dados de satélite NASA em tempo real.
-                        Camadas: Qualidade do Ar (NO₂), Temperatura LST, NDVI e Densidade Populacional.
-                      </p>
+                <Tabs value={activeLayer} onValueChange={setActiveLayer}>
+                  <TabsList className="w-full justify-start mb-4">
+                    <TabsTrigger value="air-quality">Ar</TabsTrigger>
+                    <TabsTrigger value="heat">Calor</TabsTrigger>
+                    <TabsTrigger value="vegetation">Verde</TabsTrigger>
+                    <TabsTrigger value="population">População</TabsTrigger>
+                  </TabsList>
+                  
+                  {/* Placeholder for Mapbox */}
+                  <div className="relative w-full h-[500px] rounded-lg bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center border-2 border-dashed border-border mb-4">
+                    <div className="text-center space-y-4 p-8">
+                      <div className="rounded-full bg-secondary/10 w-16 h-16 flex items-center justify-center mx-auto">
+                        <Layers className="h-8 w-8 text-secondary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">Mapa Interativo</h3>
+                        <p className="text-sm text-muted-foreground max-w-md">
+                          Configure o Mapbox para visualizar dados de satélite NASA em tempo real.
+                          Camadas: Qualidade do Ar (NO₂), Temperatura LST, NDVI e Densidade Populacional.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Layer Info */}
-                <div className="mt-4 p-4 rounded-lg bg-muted/50">
-                  <TabsContent value="air-quality" className="mt-0">
-                    <div className="space-y-2">
+                  
+                  {/* Layer Info */}
+                  <TabsContent value="air-quality">
+                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <Wind className="h-4 w-4 text-secondary" />
                         Qualidade do Ar (NO₂)
@@ -97,8 +96,9 @@ const MapView = () => {
                       </p>
                     </div>
                   </TabsContent>
-                  <TabsContent value="heat" className="mt-0">
-                    <div className="space-y-2">
+                  
+                  <TabsContent value="heat">
+                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <Thermometer className="h-4 w-4 text-orange-600" />
                         Ilhas de Calor (LST)
@@ -109,8 +109,9 @@ const MapView = () => {
                       </p>
                     </div>
                   </TabsContent>
-                  <TabsContent value="vegetation" className="mt-0">
-                    <div className="space-y-2">
+                  
+                  <TabsContent value="vegetation">
+                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <TreePine className="h-4 w-4 text-green-600" />
                         Déficit Verde (NDVI)
@@ -121,8 +122,9 @@ const MapView = () => {
                       </p>
                     </div>
                   </TabsContent>
-                  <TabsContent value="population" className="mt-0">
-                    <div className="space-y-2">
+                  
+                  <TabsContent value="population">
+                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
                       <h4 className="font-semibold flex items-center gap-2">
                         <Users className="h-4 w-4 text-blue-600" />
                         Densidade Populacional
@@ -133,7 +135,7 @@ const MapView = () => {
                       </p>
                     </div>
                   </TabsContent>
-                </div>
+                </Tabs>
               </CardContent>
             </Card>
 
