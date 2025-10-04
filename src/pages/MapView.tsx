@@ -1,15 +1,36 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import InteractiveMap from "@/components/InteractiveMap";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wind, Thermometer, TreePine, Users, Layers, Info } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Wind, Thermometer, TreePine, Users, Layers } from "lucide-react";
 
 const MapView = () => {
-  const [activeLayer, setActiveLayer] = useState<string>("air-quality");
+  const navigate = useNavigate();
+  const [activeLayers, setActiveLayers] = useState<Set<string>>(new Set(['poluicao']));
+  
+  const toggleLayer = (layerName: string) => {
+    setActiveLayers(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(layerName)) {
+        newSet.delete(layerName);
+      } else {
+        newSet.add(layerName);
+      }
+      return newSet;
+    });
+  };
+
+  const layerControls = [
+    { id: 'poluicao', label: 'Qualidade do Ar (NO₂)', icon: Wind, color: 'text-blue-600' },
+    { id: 'calor', label: 'Ilhas de Calor', icon: Thermometer, color: 'text-orange-600' },
+    { id: 'verde', label: 'Déficit Verde', icon: TreePine, color: 'text-green-600' },
+    { id: 'pop', label: 'Densidade Populacional', icon: Users, color: 'text-purple-600' },
+  ];
   
   // Mock data for demonstration
   const stats = [
@@ -37,16 +58,6 @@ const MapView = () => {
             </p>
           </div>
 
-          <Alert className="mb-6 border-secondary">
-            <Info className="h-4 w-4 text-secondary" />
-            <AlertTitle>Configuração do Mapbox</AlertTitle>
-            <AlertDescription>
-              Para visualizar o mapa interativo, adicione sua chave pública do Mapbox. 
-              Crie uma conta gratuita em <a href="https://mapbox.com" target="_blank" rel="noopener noreferrer" className="underline text-secondary font-medium">mapbox.com</a> e 
-              obtenha seu token de acesso.
-            </AlertDescription>
-          </Alert>
-
           <div className="grid lg:grid-cols-[1fr_350px] gap-6">
             {/* Map Area */}
             <Card className="lg:col-span-1">
@@ -58,84 +69,46 @@ const MapView = () => {
                   </CardTitle>
                 </div>
               </CardHeader>
-              <CardContent>
-                <Tabs value={activeLayer} onValueChange={setActiveLayer}>
-                  <TabsList className="w-full justify-start mb-4">
-                    <TabsTrigger value="air-quality">Ar</TabsTrigger>
-                    <TabsTrigger value="heat">Calor</TabsTrigger>
-                    <TabsTrigger value="vegetation">Verde</TabsTrigger>
-                    <TabsTrigger value="population">População</TabsTrigger>
-                  </TabsList>
-                  
-                  {/* Placeholder for Mapbox */}
-                  <div className="relative w-full h-[500px] rounded-lg bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center border-2 border-dashed border-border mb-4">
-                    <div className="text-center space-y-4 p-8">
-                      <div className="rounded-full bg-secondary/10 w-16 h-16 flex items-center justify-center mx-auto">
-                        <Layers className="h-8 w-8 text-secondary" />
+              <CardContent className="space-y-4">
+                {/* Mapa Interativo */}
+                <InteractiveMap activeLayers={activeLayers} />
+                
+                {/* Controles de Camadas */}
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Layers className="h-4 w-4" />
+                    Controlar Camadas
+                  </h4>
+                  <div className="space-y-3">
+                    {layerControls.map((layer) => (
+                      <div key={layer.id} className="flex items-center space-x-3 p-2 rounded hover:bg-background/50 transition-colors">
+                        <Checkbox
+                          id={`layer-${layer.id}`}
+                          checked={activeLayers.has(layer.id)}
+                          onCheckedChange={() => toggleLayer(layer.id)}
+                        />
+                        <label
+                          htmlFor={`layer-${layer.id}`}
+                          className="flex items-center gap-2 text-sm font-medium cursor-pointer flex-1"
+                        >
+                          <layer.icon className={`h-4 w-4 ${layer.color}`} />
+                          {layer.label}
+                        </label>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">Mapa Interativo</h3>
-                        <p className="text-sm text-muted-foreground max-w-md">
-                          Configure o Mapbox para visualizar dados de satélite NASA em tempo real.
-                          Camadas: Qualidade do Ar (NO₂), Temperatura LST, NDVI e Densidade Populacional.
-                        </p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                  
-                  {/* Layer Info */}
-                  <TabsContent value="air-quality">
-                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-                      <h4 className="font-semibold flex items-center gap-2">
-                        <Wind className="h-4 w-4 text-secondary" />
-                        Qualidade do Ar (NO₂)
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Dados do satélite Sentinel-5P/TROPOMI mostrando concentração de Dióxido de Nitrogênio.
-                        Áreas vermelhas indicam alta poluição.
-                      </p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="heat">
-                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-                      <h4 className="font-semibold flex items-center gap-2">
-                        <Thermometer className="h-4 w-4 text-orange-600" />
-                        Ilhas de Calor (LST)
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Temperatura da superfície terrestre via Landsat/MODIS (NASA). 
-                        Áreas mais quentes em vermelho/laranja.
-                      </p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="vegetation">
-                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-                      <h4 className="font-semibold flex items-center gap-2">
-                        <TreePine className="h-4 w-4 text-green-600" />
-                        Déficit Verde (NDVI)
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Índice de Vegetação normalizado. Verde escuro = vegetação saudável, 
-                        cinza/vermelho = concreto/déficit.
-                      </p>
-                    </div>
-                  </TabsContent>
-                  
-                  <TabsContent value="population">
-                    <div className="p-4 rounded-lg bg-muted/50 space-y-2">
-                      <h4 className="font-semibold flex items-center gap-2">
-                        <Users className="h-4 w-4 text-blue-600" />
-                        Densidade Populacional
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        Dados SEDAC (NASA) e GHSL. Áreas mais densas em azul escuro.
-                        Prioriza regiões com mais habitantes afetados.
-                      </p>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                </div>
+
+                {/* Legenda */}
+                <div className="p-4 rounded-lg bg-muted/50 space-y-2">
+                  <h4 className="font-semibold text-sm mb-2">Legenda</h4>
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p><strong className="text-blue-500">Azul → Lima → Vermelho:</strong> Qualidade do Ar (NO₂)</p>
+                    <p><strong className="text-cyan-500">Ciano → Amarelo → Vermelho:</strong> Ilhas de Calor</p>
+                    <p><strong className="text-amber-700">Marrom:</strong> Déficit de Vegetação</p>
+                    <p><strong className="text-purple-500">Azul Claro → Roxo:</strong> Densidade Populacional</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
 
@@ -186,7 +159,12 @@ const MapView = () => {
                 </CardContent>
               </Card>
 
-              <Button variant="hero" className="w-full" size="lg">
+              <Button 
+                variant="hero" 
+                className="w-full" 
+                size="lg"
+                onClick={() => navigate('/simulator')}
+              >
                 Ir para Simulador
               </Button>
             </div>
